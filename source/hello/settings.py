@@ -40,8 +40,8 @@ INSTALLED_APPS = [
 
     # Custom apps
     'webapp',
-    'accounts'
-
+    'accounts',
+    'rest_framework',
     # Lib apps
 ]
 
@@ -136,7 +136,7 @@ MEDIA_ROOT = BASE_DIR.joinpath("uploads")
 MEDIA_URL = "media/"
 
 
-try:
-    from hello.local_settings import *
-except ModuleNotFoundError:
-    print("Локальный файл настроек проекта не найден")
+# try:
+#     from hello.local_settings import *
+# except ModuleNotFoundError:
+#     print("Локальный файл настроек проекта не найден")
