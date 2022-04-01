@@ -8,6 +8,17 @@
 
     <h3>{{ article.upper }}</h3>
 
+    {% if user.is_authenticated %}
+        <p class="like-counter" id="like-counter-{{ article.pk }}">Лайкнуло: {{ article.likes.count }}</p>
+        {% if user in article.likes.all %}
+            <a class="like-link" data-article-id="{{ article.pk }}" href="{% url "webapp:unlike_article" article.pk %}">Анлайк</a>
+            <a class="like-link invisible" data-article-id="{{ article.pk }}" href="{% url "webapp:like_article" article.pk %}">Лайк</a>
+        {% else %}
+            <a class="like-link invisible" data-article-id="{{ article.pk }}" href="{% url "webapp:unlike_article" article.pk %}">Анлайк</a>
+            <a class="like-link" data-article-id="{{ article.pk }}" href="{% url "webapp:like_article" article.pk %}">Лайк</a>
+        {% endif %}
+    {% endif %}
+
     <p><a href="{{ article.get_absolute_url }}">Подробнее...</a></p>
 
     {% if perms.webapp.change_article or user == article.author %}
@@ -25,3 +36,35 @@
 {% if is_paginated %}
     {% include 'partial/pagination.html' %}
 {% endif %}
+
+<script>
+async function onClick(event){
+    event.preventDefault();
+
+    const likeLink = event.target;
+    response = await fetch(likeLink.href);
+
+    let responseData = await response.json()
+
+    if (response.ok) {
+        const articleId = likeLink.dataset.articleId;
+        let likeCounter = document.getElementById(`like-counter-${articleId}`);
+        likeCounter.innerText = `Лайкнуло: ${responseData.likes_count}`;
+
+         for (likeLinkToToggle of document.querySelectorAll(`a[data-article-id="${articleId}"]`)) {
+            likeLinkToToggle.classList.toggle("invisible");
+        }
+
+    } else {
+        alert(responseData.error);
+    }
+}
+
+function onLoad(){
+    for (element of document.getElementsByClassName("like-link")) {
+        element.addEventListener("click", onClick);
+    }
+}
+
+window.addEventListener("load", onLoad);
+</script>
