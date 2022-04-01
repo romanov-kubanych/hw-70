@@ -5,7 +5,15 @@ from webapp.views import (
     ArticleCreateView,
     ArticleView,
     ArticleUpdateView,
-    ArticleDeleteView, IndexView, CommentCreateView, CommentUpdateView, CommentDeleteView, ArticleLikeView, ArticleUnLikeView)
+    ArticleDeleteView,
+    IndexView,
+    CommentCreateView,
+    CommentUpdateView,
+    CommentDeleteView,
+    ArticleLikeView,
+    ArticleUnLikeView,
+    CommentLikeView,
+    CommentUnLikeView,)
 
 app_name = 'webapp'
 
@@ -21,4 +29,6 @@ urlpatterns = [
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name="comment_delete_view"),
     path('article/<int:pk>/like/', ArticleLikeView.as_view(), name='like_article'),
     path('article/<int:pk>/unlike/', ArticleUnLikeView.as_view(), name='unlike_article'),
+    path('comment/<int:pk>/like/', CommentLikeView.as_view(), name='like_comment'),
+    path('comment/<int:pk>/unlike/', CommentUnLikeView.as_view(), name='unlike_comment'),
 ]

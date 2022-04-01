@@ -1,4 +1,8 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from http import HTTPStatus
+
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.http import JsonResponse
+from django.views import View
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -47,3 +51,35 @@ class CommentDeleteView(PermissionRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse("webapp:article_view", kwargs={"pk": self.object.article.pk})
+
+
+class CommentLikeView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, pk=kwargs.get('pk'))
+
+        if request.user in comment.likes.all():
+            return JsonResponse(
+                {"error": 'Лайк уже поставлен'},
+                status=HTTPStatus.FORBIDDEN,
+            )
+
+        comment.likes.add(request.user)
+        return JsonResponse(
+            {"likes_count": comment.likes.count()}
+        )
+
+
+class CommentUnLikeView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, pk=kwargs.get('pk'))
+
+        if not request.user in comment.likes.all():
+            return JsonResponse(
+                {"error": 'Нужно поставить лайк'},
+                status=HTTPStatus.FORBIDDEN,
+            )
+
+        comment.likes.remove(request.user)
+        return JsonResponse(
+            {"likes_count": comment.likes.count()}
+        )
